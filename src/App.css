@@ -1,33 +1,136 @@
-.App {
-  text-align: center;
+.wrapper {
+  width: 100vw;
+}
+.wrapper > * {
+  margin: 0 0 8px;
+  opacity: 1;
+}
+.wrapper > .hide {
+  max-height: 0;
+  opacity: 0;
 }
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 40vmin;
-  pointer-events: none;
+.heading {
+  font-size: 2em;
+  font-weight: 700;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.img_input {
+  padding: 0 8px;
+}
+
+.img_view {
+  width: 100vw;
+  overflow: hidden;
+}
+.pano_place {
+  position: relative;
+  padding: 11.142% 0;
+  font-weight: 300;
+  font-style: italic;
+  color: rgba(255,255,255,0.5);
+  background: rgba(0,0,0,0.2);
+}
+.pano_place > .text {
+  width: 100%;
+  position: absolute;
+  transform: translateY(-50%);
+}
+.pano {
+  position: relative;
+  background-color: #FFFFFF;
+}
+.pano > img {
+  width: 100%;
+  display: block;
+  //position: absolute;
+  //left: 0;
+  //top: 0;
+}
+.pano > .boxes {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-flow: row nowrap;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  box-shadow: 0 0 0 9999px rgba(0,0,0,0.5);
+}
+.pano > .boxes > .box {
+  height: 100%;
+  position: relative;
+  flex: 2 1 0;
+  cursor: move;
+}
+.pano > .boxes > .box .divider {
+  width: 2px;
+  height: 100%;
+  position: absolute;
+  z-index: 1;
+  left: -1px;
+  top: 0;
+  background: rgba(255,255,255,0.5);
+}
+.pano > .boxes > .box .drag {
+  width: 8px;
+  height: 24px;
+  position: absolute;
+  z-index: 2;
+  right: -4px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 2px solid rgba(255,255,255,1);
+  border-radius: 4px;
+  background: rgba(0,0,0,1);
+  cursor: col-resize;
 }
 
-.App-link {
-  color: #61dafb;
+.img_controls {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 0 8px;
+}
+.img_controls > * {
+  flex: 1 0 0;
+}
+.img_controls .cancel, .img_controls .finish {
+  flex: 0 1 80px;
+}
+.img_controls .cancel {
+  background: #C03121;
+}
+.img_controls .finish {
+  background: #7EAF3C;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.img_result {
+  display: flex;
+  flex-flow: row nowrap;
+  padding: 0 7px;
+}
+.img_result > li {
+  position: relative;
+  margin: 0 1px;
+  flex: 1 1 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.img_result > li > * {
+  display: block;
+}
+.img_result > li .counter {
+  width: 16px;
+  height: 16px;
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  font-size: 0.6em;
+  line-height: 15px;
+  text-align: center;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.5);
 }
