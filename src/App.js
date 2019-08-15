@@ -23,6 +23,7 @@ function ImgView(props) {
         <CropBoxes
           imgWidth={props.imgWidth}
           imgHeight={props.imgHeight}
+          startX={props.startX}
           onView={props.onView}
         />
       </div>
@@ -35,24 +36,6 @@ function ImgView(props) {
     );
   }
   return <div className='img_view'>{display}</div>;
-}
-
-function ImgControls(props) {
-  let theClass = 'img_controls';
-  if (props.boxCount === 0) {
-    theClass += ' hide';
-  }
-  return (
-    <div className={theClass}>
-      <button className='cancel' onClick={props.onCancel}>Cancel</button>
-      <div>
-        <input type='range' min='0' max='100' onChange={props.onStartX} />
-        <br />
-        <span>Adjust cropping</span>
-      </div>
-      <button className='finish' onClick={props.onFinish}>Finish</button>
-    </div>
-  );
 }
 
 function ImgResult(props) {
@@ -84,6 +67,15 @@ function ImgResult(props) {
 class CropBoxes extends React.Component {
   constructor(props) {
     super(props);
+    //this.boxCount = Math.floor(this.props.imgWidth / this.props.imgHeight);
+    //this.widthRem = this.props.imgWidth - (this.boxCount * this.props.imgHeight);
+    //this.widthRemPct = this.widthRem * 100 / this.props.imgWidth;
+    //this.widthPct = 100 - this.widthRemPct;
+    //this.styleObj = {
+    //  width: this.widthPct + '%',
+      //left: (this.widthRemPct / 2) + '%'
+    //  left: this.props.startX + '%'
+    //};
     this.state = {
       boxes: [],
       boxesStyle: {}
@@ -105,35 +97,76 @@ class CropBoxes extends React.Component {
         <li
           key={b}
           className='box'
-          draggable='true'
-          onDragStart={e => this.handleDrag(e, true)}
-          onDrag={e => this.handleDrag(e, true)}
-          onDragEnd={e => this.handleDrag(e, false)}
         >
           {divider}
         </li>
       );
     }
-    this.props.onView(boxCount, startX);
+    this.props.onView(boxCount, startX, widthRem);
     this.setState({
       boxes: boxes,
       boxesStyle: {
         width: widthPct + '%',
-        left: (widthRemPct / 2) + '%'
+        //left: (widthRemPct / 2) + '%'
       }
     });
   }
-  componentDidUpdate() {
-    //console.log(this.state);
-  }
-  handleDrag(e, dragging) {
-    console.log('DRAG', dragging);
+  componentDidUpdate(prevProps) {
+    let startXPct = 0;
+    if (this.props.startX !== prevProps.startX) {
+      startXPct = this.props.startX * 100 / this.props.imgWidth;
+      this.setState({
+        boxesStyle: {
+          width: this.widthPct + '%',
+          left: startXPct + '%'
+        }
+      });
+    }
   }
   render() {
     return (
       <ul className='boxes' style={this.state.boxesStyle}>
         {this.state.boxes}
       </ul>
+    );
+  }
+}
+
+class ImgControls extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      x: this.props.startX
+    }
+    this.handleChange = this.handleChange.bind(this);
+  }
+  handleChange(e) {
+    this.props.onStartX(e);
+    this.setState({
+      x: e.target.value
+    });
+  }
+  render() {
+    let theClass = 'img_controls';
+    if (this.props.boxCount === 0) {
+      theClass += ' hide';
+    }
+    return (
+      <div className={theClass}>
+        <button className='cancel' onClick={this.props.onCancel}>Cancel</button>
+        <div>
+          <input
+            type='range'
+            min='0'
+            max={this.props.maxX}
+            value={this.state.x}
+            onChange={this.handleChange}
+          />
+          <br />
+          <span>Adjust cropping</span>
+        </div>
+        <button className='finish' onClick={this.props.onFinish}>Finish</button>
+      </div>
     );
   }
 }
@@ -156,6 +189,7 @@ class ImgCanvas extends React.Component {
   componentDidUpdate() {
     const imgX = this.props.cropX * -1;
     if (this.props.img) {
+      //console.log(imgX);
       this.state.context.drawImage(this.props.img, imgX, 0);
     }
   }
@@ -190,6 +224,7 @@ class App extends React.Component {
       imgWidth: 0,
       imgHeight: 0,
       startX: 0,
+      maxX: 0,
       boxWidth: 0,
       boxCount: 0,
       cropDone: false
@@ -218,15 +253,24 @@ class App extends React.Component {
       imgInput: imgInput
     });
   }
-  handleView(boxCount, startX) {
+  handleView(boxCount, startX, maxX) {
+    //console.log('handleView', startX);
     this.setState({
       boxCount: boxCount,
-      startX: startX
+      //startX: startX,
+      maxX: maxX
+    });
+  }
+  handleStartX(input) {
+    //console.log('handleStartX', input.value, this.state.startX, this.state.maxX);
+    this.setState({
+      startX: Number(input.value)
     });
   }
   handleCancel() {
     this.state.imgInput.value = '';
     this.setState({
+      img: null,
       imgWidth: 0,
       imgHeight: 0,
       boxCount: 0,
@@ -241,13 +285,11 @@ class App extends React.Component {
     }
   }
   render() {
+    //console.log('App render', this.state.startX);
     return (
       <div className='wrapper'>
         <header>
           <h1 className='heading'>Instorama</h1>
-          <h2>
-            <span>Crop a panorama photo</span> <span>into insta-ready tiles.</span>
-          </h2>
         </header>
         <ImgInput
           img={this.state.img}
@@ -257,10 +299,14 @@ class App extends React.Component {
           imgData={this.state.imgData}
           imgWidth={this.state.imgWidth}
           imgHeight={this.state.imgHeight}
-          onView={(boxCount, startX) => this.handleView(boxCount, startX)}
+          startX={this.state.startX}
+          onView={(boxCount, startX, maxX) => this.handleView(boxCount, startX, maxX)}
         />
         <ImgControls
+          startX={this.state.startX}
+          maxX={this.state.maxX}
           boxCount={this.state.boxCount}
+          onStartX={e => this.handleStartX(e.target)}
           onCancel={() => this.handleCancel()}
           onFinish={() => this.handleFinish()}
         />

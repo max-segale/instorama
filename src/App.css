@@ -7,7 +7,9 @@
 }
 .wrapper > .hide {
   max-height: 0;
+  margin: 0;
   opacity: 0;
+  overflow: hidden;
 }
 
 .heading {
@@ -62,7 +64,7 @@
   height: 100%;
   position: relative;
   flex: 2 1 0;
-  cursor: move;
+  //cursor: move;
 }
 .pano > .boxes > .box .divider {
   width: 2px;
