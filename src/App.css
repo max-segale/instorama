@@ -1,20 +1,50 @@
 .wrapper {
   width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  flex-flow: column nowrap;
+  //align-items: center;
+  justify-content: center;
 }
 .wrapper > * {
-  margin: 0 0 8px;
-  opacity: 1;
+  width: 100%;
+  max-height: 100vh;
+  flex: 0 0 0;
+  margin: 0 auto 8px;
+  //opacity: 1;
+  overflow: hidden;
+  //transition: opacity 250ms;
+}
+.wrapper > .show {
+  //animation: fadeIn 250ms;
 }
 .wrapper > .hide {
+  //flex: 0;
   max-height: 0;
   margin: 0;
-  opacity: 0;
-  overflow: hidden;
+  //opacity: 0;
+  
+  //visibility: hidden;
+}
+@keyframes fadeIn {
+  from {
+    max-height: 0;
+    margin: 0;
+    opacity: 0;
+  }
+  to {
+    max-height: 100vh;
+    margin: 0 auto 8px;
+    opacity: 1;
+  }
 }
 
 .heading {
   font-size: 2em;
   font-weight: 700;
+}
+.desc {
+  padding: 0 8px;
 }
 
 .img_input {
@@ -28,15 +58,30 @@
 .pano_place {
   position: relative;
   padding: 11.142% 0;
+  background: rgba(0,0,0,0.2);
+}
+.pano_place > .holder {
+  width: 100%;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.pano_place > .holder > .logo {
+  width: 16%;
+  margin: 0 auto;
+  padding-bottom: 16%;
+  border-radius: 8px;
+  background:
+    url('logo.svg')
+    center center / cover
+    no-repeat;
+}
+.pano_place > .holder > .text {
+  font-size: 0.8em;
   font-weight: 300;
   font-style: italic;
   color: rgba(255,255,255,0.5);
-  background: rgba(0,0,0,0.2);
-}
-.pano_place > .text {
-  width: 100%;
-  position: absolute;
-  transform: translateY(-50%);
 }
 .pano {
   position: relative;
@@ -108,23 +153,26 @@
 .img_controls .finish {
   background: #7EAF3C;
 }
+.img_controls .hide {
+  display: none;
+}
 
-.img_result {
+.img_result > ul {
   display: flex;
   flex-flow: row nowrap;
   padding: 0 7px;
 }
-.img_result > li {
+.img_result > ul > li {
   position: relative;
   margin: 0 1px;
   flex: 1 1 0;
   border-radius: 8px;
   overflow: hidden;
 }
-.img_result > li > * {
+.img_result > ul > li > * {
   display: block;
 }
-.img_result > li .counter {
+.img_result > ul > li .counter {
   width: 16px;
   height: 16px;
   position: absolute;
@@ -135,4 +183,10 @@
   text-align: center;
   border-radius: 8px;
   background: rgba(0,0,0,0.5);
+}
+.img_result > .back {
+  margin-top: 8px;
+  padding-left: 8px;
+  padding-right: 8px;
+  background: #C03121;
 }

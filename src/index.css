@@ -15,6 +15,7 @@ html, body {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 h1, h2, h3 {
+  display: inline;
   font-size: initial;
   font-weight: initial;
 }
