@@ -2,6 +2,7 @@
     margin: 0;
     border: 0;
     padding: 0;
+    outline: none;
     box-sizing: border-box;
 }
 html, body {
@@ -37,7 +38,7 @@ a, a:hover, a:active, a:visited {
   color: inherit;
   cursor: pointer;
 }
-button, input[type=file] {
+button, input[type="file"] {
   max-width: 100%;
   border: 1px solid rgba(255,255,255,0.2);
   border-radius: 8px;

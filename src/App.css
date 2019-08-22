@@ -1,42 +1,25 @@
 .wrapper {
   width: 100vw;
-  min-height: 100vh;
+  min-height: 80vh;
   display: flex;
   flex-flow: column nowrap;
-  //align-items: center;
+  align-items: center;
   justify-content: center;
+  animation: fadeIn 1000ms;
 }
 .wrapper > * {
   width: 100%;
-  max-height: 100vh;
   flex: 0 0 0;
   margin: 0 auto 8px;
-  //opacity: 1;
+  opacity: 1;
   overflow: hidden;
-  //transition: opacity 250ms;
-}
-.wrapper > .show {
-  //animation: fadeIn 250ms;
+  //will-change: opacity;
+  transition: opacity 500ms;
 }
 .wrapper > .hide {
-  //flex: 0;
   max-height: 0;
   margin: 0;
-  //opacity: 0;
-  
-  //visibility: hidden;
-}
-@keyframes fadeIn {
-  from {
-    max-height: 0;
-    margin: 0;
-    opacity: 0;
-  }
-  to {
-    max-height: 100vh;
-    margin: 0 auto 8px;
-    opacity: 1;
-  }
+  opacity: 0;
 }
 
 .heading {
@@ -48,7 +31,10 @@
 }
 
 .img_input {
+  max-height: 100px;
   padding: 0 8px;
+  //will-change: margin, max-height; 
+  transition: margin 500ms, max-height 500ms;
 }
 
 .img_view {
@@ -57,8 +43,20 @@
 }
 .pano_place {
   position: relative;
-  padding: 11.142% 0;
+  padding: 11.1645% 0;
   background: rgba(0,0,0,0.2);
+}
+.pano_place > .text {
+  font-size: 0.8em;
+  font-weight: 300;
+  font-style: italic;
+  line-height: 0;
+  color: rgba(255,255,255,0.5);
+  opacity: 0;
+  transition: opacity 500ms;
+}
+.pano_place.loading > .text {
+  opacity: 1;
 }
 .pano_place > .holder {
   width: 100%;
@@ -68,33 +66,42 @@
   transform: translateY(-50%);
 }
 .pano_place > .holder > .logo {
-  width: 16%;
+  width: 20%;
   margin: 0 auto;
-  padding-bottom: 16%;
+  padding-bottom: 20%;
   border-radius: 8px;
   background:
     url('logo.svg')
     center center / cover
     no-repeat;
+  //will-change: width, padding-bottom;
+  transition: width 500ms, padding-bottom 500ms;
 }
-.pano_place > .holder > .text {
-  font-size: 0.8em;
-  font-weight: 300;
-  font-style: italic;
-  color: rgba(255,255,255,0.5);
+.pano_place.loading > .holder > .logo {
+  width: 0;
+  padding-bottom: 0;
 }
 .pano {
   position: relative;
-  background-color: #FFFFFF;
+  background-color: #666666;
 }
-.pano > img {
+.pano > .image {
   width: 100%;
   display: block;
-  //position: absolute;
-  //left: 0;
-  //top: 0;
+  opacity: 1;
+  margin: 0 auto;
+  //will-change: opacity;
+  //animation: fadeIn 500ms;
 }
-.pano > .boxes {
+.pano > .area {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  box-shadow: 0 0 0 999px rgba(0,0,0,0.6);
+}
+.pano > .area > .boxes {
   width: 100%;
   height: 100%;
   position: absolute;
@@ -103,15 +110,14 @@
   display: flex;
   flex-flow: row nowrap;
   justify-content: center;
-  box-shadow: 0 0 0 9999px rgba(0,0,0,0.5);
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.5);
 }
-.pano > .boxes > .box {
+.pano > .area > .boxes > .box {
   height: 100%;
   position: relative;
   flex: 2 1 0;
-  //cursor: move;
 }
-.pano > .boxes > .box .divider {
+.pano > .area > .boxes > .box .divider {
   width: 2px;
   height: 100%;
   position: absolute;
@@ -120,7 +126,7 @@
   top: 0;
   background: rgba(255,255,255,0.5);
 }
-.pano > .boxes > .box .drag {
+.pano > .area > .boxes > .box .drag {
   width: 8px;
   height: 24px;
   position: absolute;
@@ -172,6 +178,9 @@
 .img_result > ul > li > * {
   display: block;
 }
+.img_result > ul > li a:visited {
+  opacity: 0.5;
+}
 .img_result > ul > li .counter {
   width: 16px;
   height: 16px;
@@ -189,4 +198,13 @@
   padding-left: 8px;
   padding-right: 8px;
   background: #C03121;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

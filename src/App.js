@@ -1,5 +1,4 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 
 function DescText(props) {
@@ -7,11 +6,11 @@ function DescText(props) {
     <div>
       <h1>Crop a panorama for Instagram </h1>
       <h2>so it can be seemlessly swiped through, </h2>
-      <h3><span>for a better view. 👍🏻 </span></h3>
+      <h3><span>for a better view.</span></h3>
     </div>
   );
   if (props.done) {
-    text = 'Click each photo to download it to your device.';
+    text = 'Download each new photo (in reverse order) then open Instagram and select multiple photos.';
   }
   return (
     <div className='desc'>
@@ -22,23 +21,24 @@ function DescText(props) {
 
 function ImgInput(props) {
   let theClass = 'img_input';
-  if (props.img) {
+  if (props.done) {
      theClass += ' hide';
   }
   return (
     <div className={theClass}>
-      <input type='file' onChange={props.onInput} />
+      <input type='file' accept='image/*' onChange={props.onInput} />
     </div>
   );
 }
 
 function ImgView(props) {
   let theClass = 'img_view';
+  let placeClass = 'pano_place';
   let display = null;
   if (props.imgWidth && props.imgHeight) {
     display = (
       <div className='pano'>
-        <img src={props.imgData} alt='panorama' />
+        <img className='image' src={props.imgData} alt='panorama' />
         <CropBoxes
           imgWidth={props.imgWidth}
           imgHeight={props.imgHeight}
@@ -48,8 +48,12 @@ function ImgView(props) {
       </div>
     );
   } else {
+    if (props.loading) {
+      placeClass += ' loading';
+    }
     display = (
-      <div className='pano_place'>
+      <div className={placeClass}>
+        <div className='text'>Loading...</div>
         <div className='holder'>
           <div className='logo'></div>
         </div>
@@ -86,6 +90,7 @@ function ImgResult(props) {
       </li>
     );
   }
+  results.reverse();
   return (
     <div className={theClass}>
       <ul>
@@ -146,9 +151,11 @@ class CropBoxes extends React.Component {
   }
   render() {
     return (
-      <ul className='boxes' style={this.state.boxesStyle}>
-        {this.state.boxes}
-      </ul>
+      <div className='area' style={this.state.boxesStyle}>
+        <ul className='boxes'>
+          {this.state.boxes}
+        </ul>
+      </div>
     );
   }
 }
@@ -219,10 +226,11 @@ class ImgCanvas extends React.Component {
     const theURL = theCanvas.toDataURL('image/jpeg');
     const theLink = theCanvas.parentNode;
     theLink.href = theURL;
+    //console.log(theLink);
   }
   render() {
     return (
-      <a download={this.fileName} onClick={() => this.handleClick()}>
+      <a target='_blank' download={this.fileName} onClick={() => this.handleClick()}>
         <canvas
           ref={this.canvasRef}
           width={this.props.width}
@@ -248,6 +256,7 @@ class App extends React.Component {
       maxX: 0,
       boxWidth: 0,
       boxCount: 0,
+      browseDone: false,
       cropDone: false
     }
   }
@@ -269,10 +278,13 @@ class App extends React.Component {
         imgData: imgSrc
       });
     };
-    fReader.readAsDataURL(imgFile);
     this.setState({
-      imgInput: imgInput
+      imgInput: imgInput,
+      browseDone: true
     });
+    setTimeout(() => {
+      fReader.readAsDataURL(imgFile);
+    }, 500);
   }
   handleView(boxCount, startX, maxX) {
     this.setState({
@@ -293,7 +305,8 @@ class App extends React.Component {
       imgWidth: 0,
       imgHeight: 0,
       boxCount: 0,
-      cropDone: false
+      browseDone: false
+      //cropDone: false
     });
   }
   handleFinish() {
@@ -319,7 +332,7 @@ class App extends React.Component {
             />
           </header>
           <ImgInput
-            img={this.state.img}
+            done={this.state.browseDone}
             onInput={e => this.handleInput(e.target)}
           />
           <ImgView
@@ -327,6 +340,7 @@ class App extends React.Component {
             imgWidth={this.state.imgWidth}
             imgHeight={this.state.imgHeight}
             startX={this.state.startX}
+            loading={this.state.browseDone}
             cropDone={this.state.cropDone}
             onView={(boxCount, startX, maxX) => this.handleView(boxCount, startX, maxX)}
           />
