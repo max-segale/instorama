@@ -4,13 +4,12 @@ import './App.css';
 function DescText(props) {
   let text = (
     <div>
-      <h1>Crop a panorama for Instagram </h1>
-      <h2>so it can be seemlessly swiped through, </h2>
-      <h3><span>for a better view.</span></h3>
+      <h1>Crop a panorama for Instagram, </h1>
+      <span><h2>so it can be seemlessly swiped through</h2></span> <span><h3>for a better view.</h3></span>
     </div>
   );
   if (props.done) {
-    text = 'Download each new photo (in reverse order) then open Instagram and select multiple photos.';
+    text = 'Download each new photo, in reverse order, then open Instagram and select multiple photos.';
   }
   return (
     <div className='desc'>
