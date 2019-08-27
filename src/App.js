@@ -5,11 +5,13 @@ function DescText(props) {
   let text = (
     <div>
       <h1>Crop a panorama for Instagram, </h1>
-      <span><h2>so it can be seemlessly swiped through</h2></span> <span><h3>for a better view.</h3></span>
+      <span><h2>so it can be seamlessly swiped through</h2></span> <span><h3>for a better view.</h3></span>
     </div>
   );
-  if (props.done) {
+  if (props.cropped) {
     text = 'Download each new photo, in reverse order, then open Instagram and select multiple photos.';
+  } else if (props.selected) {
+    text = 'Adjust your photo cropping.';
   }
   return (
     <div className='desc'>
@@ -327,7 +329,8 @@ class App extends React.Component {
           <header>
             <div className='heading'>Instorama</div>
             <DescText
-              done={this.state.cropDone}
+              selected={this.state.browseDone}
+              cropped={this.state.cropDone}
             />
           </header>
           <ImgInput
