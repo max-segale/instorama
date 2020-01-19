@@ -1,9 +1,9 @@
 * {
-    margin: 0;
-    border: 0;
-    padding: 0;
-    outline: none;
-    box-sizing: border-box;
+  margin: 0;
+  border: 0;
+  padding: 0;
+  outline: none;
+  box-sizing: border-box;
 }
 html, body {
   color: #FFFFFF;
@@ -23,6 +23,9 @@ h1, h2, h3 {
 span {
   white-space: nowrap;
 }
+small {
+  font-size: 0.8em;
+}
 ul {
   list-style: none;
 }
@@ -33,19 +36,22 @@ canvas {
   display: block;
   max-width: 100%;
 }
+a, button, label {
+  cursor: pointer;
+}
 a, a:hover, a:active, a:visited {
   text-decoration: none;
   color: inherit;
-  cursor: pointer;
 }
-button, input[type="file"] {
+button {
   max-width: 100%;
   border: 1px solid rgba(255,255,255,0.2);
   border-radius: 8px;
   padding: 4px;
   color: #FFFFFF;
-  background: #3D82FF;
   font-size: 1em;
   font-weight: 500;
-  cursor: pointer;
+}
+input[type="file"] {
+  display: none;
 }
