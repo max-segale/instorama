@@ -1,41 +1,70 @@
 .wrapper {
   width: 100vw;
-  min-height: 80vh;
+  min-height: 100vh;
   display: flex;
   flex-flow: column nowrap;
   align-items: center;
   justify-content: center;
   animation: fadeIn 1000ms;
-}
-.wrapper > * {
-  width: 100%;
-  max-width: 1020px;
-  flex: 0 0 0;
-  margin: 0 auto 8px;
-  opacity: 1;
-  overflow: hidden;
-  //will-change: opacity;
-  transition: opacity 500ms;
-}
-.wrapper > .hide {
-  max-height: 0;
-  margin: 0;
-  opacity: 0;
+  > * {
+    width: 100%;
+    max-width: 1020px;
+    flex: 0 0 0;
+    margin: 0 auto 8px;
+    opacity: 1;
+    overflow: hidden;
+    //will-change: opacity;
+    transition: opacity 500ms;
+  }
+  > .hide {
+    max-height: 0;
+    margin: 0;
+    opacity: 0;
+  }
+  header, footer {
+    flex: 1 0 0;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    justify-content: flex-end;
+  }
 }
 
-.heading {
-  font-size: 2em;
-  font-weight: 700;
-}
-.desc {
-  padding: 0 8px;
+header {
+  padding: 8px 0 0;
+  .logo {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto;
+    border-radius: 8px;
+    background: url('logo.svg') center center / cover no-repeat;
+  }
+  .heading {
+    font-size: 2em;
+    font-weight: 300;
+  }
+  .desc {
+    padding: 8px;
+  }
 }
 
-.img_input {
-  max-height: 100px;
-  padding: 0 8px;
-  //will-change: margin, max-height; 
-  transition: margin 500ms, max-height 500ms;
+.pano_area {
+  background: rgba(0,0,0,0.2);
+  .browse {
+    padding: 13% 0;
+    position: relative;
+    .img_input {
+      width: 100%;
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      //max-height: 100px;
+      //padding: 0 8px;
+      //will-change: margin, max-height;
+      //transition: margin 500ms, max-height 500ms;
+    }
+  }
 }
 
 .img_view {
@@ -43,6 +72,7 @@
   overflow: hidden;
 }
 .pano_place {
+  height: 0;
   position: relative;
   padding: 11.1645% 0;
   background: rgba(0,0,0,0.2);
@@ -58,29 +88,6 @@
 }
 .pano_place.loading > .text {
   opacity: 1;
-}
-.pano_place > .holder {
-  width: 100%;
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-}
-.pano_place > .holder > .logo {
-  width: 20%;
-  margin: 0 auto;
-  padding-bottom: 20%;
-  border-radius: 8px;
-  background:
-    url('logo.svg')
-    center center / cover
-    no-repeat;
-  //will-change: width, padding-bottom;
-  transition: width 500ms, padding-bottom 500ms;
-}
-.pano_place.loading > .holder > .logo {
-  width: 0;
-  padding-bottom: 0;
 }
 .pano {
   position: relative;
