@@ -1,77 +1,63 @@
 import React from 'react';
-import './App.css';
+import './App.scss';
 
-function DescText(props) {
-  let text = (
-    <div>
-      <h1>Crop a panorama for Instagram, </h1>
-      <span><h2>so it can be seamlessly swiped through</h2></span> <span><h3>for a better view.</h3></span>
-    </div>
-  );
-  if (props.cropped) {
-    text = 'Download each new photo, in reverse order, then open Instagram and select multiple photos.';
-  } else if (props.selected) {
-    text = 'Adjust your photo cropping.';
-  }
-  return (
-    <div className='desc'>
-      {text}
-    </div>
-  );
-}
-
-function ImgInput(props) {
-  let theClass = 'img_input';
-  if (props.done) {
-     theClass += ' hide';
+function Instructions(props) {
+  let message = 'Adjust Photo Cropping';
+  let theClass = 'instructions';
+  if (!props.loaded) {
+    theClass += ' hide';
+  } else if (props.cropped) {
+    message = 'Save Your Photos';
   }
   return (
     <div className={theClass}>
-      <input type='file' accept='image/*' onChange={props.onInput} />
+      <div className='msg'>{message}</div>
     </div>
   );
 }
 
-function ImgView(props) {
-  let theClass = 'img_view';
-  let placeClass = 'pano_place';
+function ImgBrowse(props) {
   let display = null;
-  if (props.imgWidth && props.imgHeight) {
+  if (!props.selected) {
     display = (
-      <div className='pano'>
-        <img className='image' src={props.imgData} alt='panorama' />
+      <label>
+        <div className='browse'>
+          <input type='file' accept='image/*' onChange={props.onBrowse} />
+          <div className='btn'>Select Your Photo</div>
+        </div>
+      </label>
+    );
+  } else if (!props.loaded) {
+    display = (
+      <div className='loading'>Loading Photo</div>
+    );
+  }
+  return display;
+}
+
+function ImgView(props) {
+  let display = null;
+  if (props.width && props.height) {
+    display = (
+      <div className='view'>
+        <img src={props.source} alt='Instorama' />
         <CropBoxes
-          imgWidth={props.imgWidth}
-          imgHeight={props.imgHeight}
+          imgWidth={props.width}
+          imgHeight={props.height}
           startX={props.startX}
           onView={props.onView}
         />
       </div>
     );
-  } else {
-    if (props.loading) {
-      placeClass += ' loading';
-    }
-    display = (
-      <div className={placeClass}>
-        <div className='text'>Loading...</div>
-        <div className='holder'>
-          <div className='logo'></div>
-        </div>
-      </div>
-    );
   }
-  if (props.cropDone) {
-    theClass += ' hide';
-  }
-  return <div className={theClass}>{display}</div>;
+  return display;
 }
 
 function ImgResult(props) {
   const results = [];
   const imgWidth = props.imgHeight;
   let cropX = props.startX;
-  let theClass = 'img_result';
+  let theClass = 'result';
   if (!props.cropDone) {
     theClass += ' hide';
   }
@@ -88,10 +74,11 @@ function ImgResult(props) {
           height={imgWidth}
           cropX={cropX}
         />
+        <div className='counter'>{b + 1}</div>
       </li>
     );
   }
-  results.reverse();
+  //results.reverse();
   return (
     <div className={theClass}>
       <ul>
@@ -152,7 +139,7 @@ class CropBoxes extends React.Component {
   }
   render() {
     return (
-      <div className='area' style={this.state.boxesStyle}>
+      <div className='crop' style={this.state.boxesStyle}>
         <ul className='boxes'>
           {this.state.boxes}
         </ul>
@@ -161,40 +148,61 @@ class CropBoxes extends React.Component {
   }
 }
 
+function ControlOption(props) {
+  return (
+    <li>
+      <input
+        type={props.type}
+        min={props.min}
+        max={props.max}
+        value={props.value}
+        onChange={props.onControl}
+      />
+      <br />
+      <span>{props.name}</span>
+    </li>
+  );
+}
+
 class ImgControls extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      x: this.props.startX
-    }
-    this.handleChange = this.handleChange.bind(this);
-  }
-  handleChange(e) {
-    this.props.onStartX(e);
-    this.setState({
-      x: e.target.value
-    });
   }
   render() {
-    let theClass = 'img_controls';
+    let theClass = 'controls';
     if (this.props.boxCount === 0 || this.props.cropDone) {
       theClass += ' hide';
     }
     return (
       <div className={theClass}>
-        <button className='cancel' onClick={this.props.onCancel}>Cancel</button>
-        <div>
-          <input
-            type='range'
-            min='0'
+        <ul className='options'>
+          <ControlOption
+            name={'Adjust Height'}
+            type={'range'}
+            min={0}
+            max={0}
+            value={0}
+          />
+          <ControlOption
+            name={'Horizontal Position'}
+            type={'range'}
+            min={0}
             max={this.props.maxX}
             value={this.props.startX}
-            onChange={this.handleChange}
+            onControl={this.props.onXPos}
           />
-          <br />
-          <span>Adjust Position</span>
+          <ControlOption
+            name={'Vertical Position'}
+            type={'range'}
+            min={0}
+            max={0}
+            value={0}
+          />
+        </ul>
+        <div className='confirm'>
+          <button className='cancel' onClick={this.props.onCancel}>Cancel</button>
+          <button className='finish' onClick={this.props.onFinish}>Finish</button>
         </div>
-        <button className='finish' onClick={this.props.onFinish}>Finish</button>
       </div>
     );
   }
@@ -203,7 +211,7 @@ class ImgControls extends React.Component {
 class ImgCanvas extends React.Component {
   constructor(props) {
     super(props);
-    this.fileName = 'Instorama';
+    this.fileName = 'Instorama-' + this.props.num;
     this.canvasRef = React.createRef();
     this.state = {
       context: null
@@ -230,16 +238,14 @@ class ImgCanvas extends React.Component {
     //console.log(theLink);
   }
   render() {
+    // <a target='_blank' download={this.fileName} onClick={() => this.handleClick()}>
     return (
-      <a target='_blank' download={this.fileName} onClick={() => this.handleClick()}>
-        <canvas
-          ref={this.canvasRef}
-          width={this.props.width}
-          height={this.props.height}
-        >
-        </canvas>
-        <div className='counter'>{this.props.num}</div>
-      </a>
+      <canvas
+        ref={this.canvasRef}
+        width={this.props.width}
+        height={this.props.height}
+      >
+      </canvas>
     );
   }
 }
@@ -247,7 +253,11 @@ class ImgCanvas extends React.Component {
 class App extends React.Component {
   constructor(props) {
     super(props);
+    this.year = new Date().getFullYear();
     this.state = {
+      imgSelected: false,
+      imgLoaded: false,
+      imgCropped: false,
       imgInput: null,
       img: null,
       imgData: '',
@@ -256,12 +266,10 @@ class App extends React.Component {
       startX: 0,
       maxX: 0,
       boxWidth: 0,
-      boxCount: 0,
-      browseDone: false,
-      cropDone: false
+      boxCount: 0
     }
   }
-  handleInput(imgInput) {
+  handleBrowse(imgInput) {
     const imgFile = imgInput.files[0];
     const fReader = new FileReader();
     fReader.onload = () => {
@@ -272,7 +280,8 @@ class App extends React.Component {
         this.setState({
           img: img,
           imgWidth: img.width,
-          imgHeight: img.height
+          imgHeight: img.height,
+          imgLoaded: true
         });
       };
       this.setState ({
@@ -281,7 +290,7 @@ class App extends React.Component {
     };
     this.setState({
       imgInput: imgInput,
-      browseDone: true
+      imgSelected: true
     });
     setTimeout(() => {
       fReader.readAsDataURL(imgFile);
@@ -306,52 +315,63 @@ class App extends React.Component {
       imgWidth: 0,
       imgHeight: 0,
       boxCount: 0,
-      browseDone: false
-      //cropDone: false
+      imgSelected: false,
+      imgLoaded: false,
+      //imgCropped: false
     });
   }
   handleFinish() {
     if (this.state.boxCount > 0) {
       this.setState({
-        cropDone: true
+        imgCropped: true
       });
     }
   }
   handleBack() {
     this.setState({
-      cropDone: false
+      imgCropped: false
     });
   }
   render() {
-    //console.log('App render', this.state.startX);
     return (
       <div className='wrapper'>
-          <header>
-            <div className='heading'>Instorama</div>
-            <DescText
-              selected={this.state.browseDone}
-              cropped={this.state.cropDone}
-            />
+        <div className='content'>
+          <header className={this.state.imgSelected ? 'hide' : null}>
+            <div className='logo'></div>
+            <div className='heading'>
+              <h1>Instorama</h1>
+            </div>
+            <div className='desc'>
+              <h2>Crop a panorama into separate photos </h2>
+              <h3>so they can be seemlessly swiped through on Instagram.</h3>
+            </div>
           </header>
-          <ImgInput
-            done={this.state.browseDone}
-            onInput={e => this.handleInput(e.target)}
+          <Instructions
+            loaded={this.state.imgLoaded}
+            cropped={this.state.imgCropped}
           />
-          <ImgView
-            imgData={this.state.imgData}
-            imgWidth={this.state.imgWidth}
-            imgHeight={this.state.imgHeight}
-            startX={this.state.startX}
-            loading={this.state.browseDone}
-            cropDone={this.state.cropDone}
-            onView={(boxCount, startX, maxX) => this.handleView(boxCount, startX, maxX)}
-          />
+          <div className={'photo' + (this.state.imgLoaded ? '' : ' place') + (this.state.imgCropped ? ' hide' : '')}>
+            <ImgBrowse
+              selected={this.state.imgSelected}
+              loaded={this.state.imgLoaded}
+              onBrowse={(e) => this.handleBrowse(e.target)}
+            />
+            <ImgView
+              cropped={this.state.imgCropped}
+              source={this.state.imgData}
+              width={this.state.imgWidth}
+              height={this.state.imgHeight}
+              startX={this.state.startX}
+              onView={(boxCount, startX, maxX) => this.handleView(boxCount, startX, maxX)}
+            />
+          </div>
           <ImgControls
+            boxCount={this.state.boxCount}
+            cropDone={this.state.imgCropped}
+
             startX={this.state.startX}
             maxX={this.state.maxX}
-            boxCount={this.state.boxCount}
-            cropDone={this.state.cropDone}
-            onStartX={e => this.handleStartX(e.target)}
+            onXPos={(e) => this.handleStartX(e.target)}
             onCancel={() => this.handleCancel()}
             onFinish={() => this.handleFinish()}
           />
@@ -360,9 +380,18 @@ class App extends React.Component {
             imgHeight={this.state.imgHeight}
             startX={this.state.startX}
             boxCount={this.state.boxCount}
-            cropDone={this.state.cropDone}
+            cropDone={this.state.imgCropped}
             onBack={() => this.handleBack()}
           />
+        </div>
+        <footer>
+          <a href='http://maxsegale.com' target='_blank' rel='noopener'>
+            <small>
+              <span>Max Segale &copy; </span>
+              <span>{this.year}</span>
+            </small>
+          </a>
+        </footer>
       </div>
     );
   }
