@@ -2,6 +2,6 @@
 
 Crop a panorama into separate photos so they can be seemlessly swiped through on Instagram.
 
-```
-https://instorama.net
-```
+A React Progressive Web App.
+
+[instorama.net](https://instorama.net)
