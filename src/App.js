@@ -356,6 +356,12 @@ class App extends React.Component {
         startX: newMaxX
       });
     }
+    // Make sure crop area isn't going off the bottom
+    if ((newHeight + this.state.startY) > this.state.imgHeight) {
+      this.setState({
+        startY: this.state.imgHeight - newHeight
+      });
+    }
     this.setState({
       boxCountMax: newMaxBoxCount,
       cropWidth: newWidth,
