@@ -13,6 +13,7 @@ html, body {
   text-align: center;
   font-size: 18px;
   font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+  -webkit-text-size-adjust: none;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   -webkit-user-select: none;
@@ -21,19 +22,13 @@ html, body {
 h1, h2, h3 {
   display: inline;
   font-size: inherit;
-  font-weight: initial;
+  font-weight: inherit;
 }
 ul {
   list-style: none;
 }
-li {
+li, img, canvas {
   display: block;
-}
-canvas {
-  display: block;
-}
-a, button, label {
-  cursor: pointer;
 }
 a, a:hover, a:active, a:visited {
   text-decoration: none;
