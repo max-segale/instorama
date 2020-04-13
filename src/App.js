@@ -25,10 +25,10 @@ function Header(props) {
 
 // Change instructions based on step in process
 function Instructions(props) {
-  let message = 'Adjust Photo Cropping';
+  let message = 'Adjust the photo cropping, (reduce the height to add more images).';
   if (props.loaded || props.cropped) {
     if (props.cropped) {
-      message = 'Save Your Photos';
+      message = 'Done! Save the new images to your photo library.';
     }
     return (
       <div className='instructions'>{message}</div>
@@ -266,6 +266,10 @@ function ImgResults(props) {
         <ul>
           {results}
         </ul>
+        <div className='tip'>
+          <span>Press and hold each photo to add it to your photo library, (start with photo 1 and work your way back). </span>
+          <span>Once all the photos have been saved, open Instagram and add all the photos as a multi-photo post.</span>
+        </div>
         <button className='back' onClick={props.onBack}>Back</button>
       </div>
     );
