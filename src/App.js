@@ -268,6 +268,7 @@ function ImgResults(props) {
         </ul>
         <div className='tip'>
           <span>Press and hold each photo to add it to your photo library, (start with photo 1 and work your way back). </span>
+          <br />
           <span>Once all the photos have been saved, open Instagram and add all the photos as a multi-photo post.</span>
         </div>
         <button className='back' onClick={props.onBack}>Back</button>
