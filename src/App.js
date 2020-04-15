@@ -281,7 +281,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.year = new Date().getFullYear();
-    this.state = {
+    this.defaultState = {
       imgSelected: false,
       imgLoaded: false,
       imgCropped: false,
@@ -299,7 +299,8 @@ class App extends React.Component {
       maxX: 0,
       startY: 0,
       maxY: 0
-    }
+    };
+    this.state = this.defaultState;
   }
 
   // Image loaded
@@ -308,19 +309,24 @@ class App extends React.Component {
     const initBoxCount = Math.floor(img.width / img.height);
     // How much space will be left over
     const widthRem = img.width - (initBoxCount * img.height);
-    this.setState({
-      img: img,
-      imgWidth: img.width,
-      imgHeight: img.height,
-      imgLoaded: true,
-      boxCount: initBoxCount,
-      boxCountMax: initBoxCount,
-      startX: widthRem / 2,
-      maxX: widthRem,
-      maxHeight: img.height,
-      cropWidth: (img.width - widthRem) / initBoxCount,
-      cropHeight: img.height
-    });
+    if (img.width < img.height) {
+      alert('Your photo must be wider than it is tall. Please select a different photo.');
+      this.handleCancel();
+    } else {
+      this.setState({
+        img: img,
+        imgWidth: img.width,
+        imgHeight: img.height,
+        imgLoaded: true,
+        boxCount: initBoxCount,
+        boxCountMax: initBoxCount,
+        startX: widthRem / 2,
+        maxX: widthRem,
+        maxHeight: img.height,
+        cropWidth: (img.width - widthRem) / initBoxCount,
+        cropHeight: img.height
+      });
+    }
   }
 
   // Image read
@@ -437,14 +443,7 @@ class App extends React.Component {
 
   // Return to image selection
   handleCancel() {
-    this.setState({
-      img: null,
-      imgWidth: 0,
-      imgHeight: 0,
-      boxCount: 0,
-      imgSelected: false,
-      imgLoaded: false
-    });
+    this.setState(this.defaultState);
   }
 
   // Show new images
