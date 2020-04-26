@@ -7,6 +7,15 @@ $blueColor: #3D82FF;
 $imgPlus: "icons/plus.svg";
 $imgMinus: "icons/minus.svg";
 
+// reusable styles
+@mixin range-thumb {
+  width: 16px;
+  height: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  background: white;
+}
+
 // Page structure
 #root {
   width: 100%;
@@ -68,12 +77,16 @@ input[type="range"] {
   background: rgba(0, 0, 0, 0.4);
   -webkit-appearance: none;
   &::-webkit-slider-thumb {
-    width: 16px;
-    height: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    border-radius: 8px;
-    background: white;
+    @include range-thumb;
     -webkit-appearance: none;
+  }
+  &::-moz-range-thumb {
+    @include range-thumb;
+    -moz-appearance: none;
+  }
+  &::-ms-track {
+    @include range-thumb;
+    -ms-appearance: none;
   }
   &:focus {
     outline: none;
@@ -120,7 +133,7 @@ header {
 // Photo area
 .photo {
   position: relative;
-  background: rgba(0,0,0,0.2);
+  background: rgba(0, 0, 0, 0.4);
   overflow: hidden;
   &.place {
     height: 0;
