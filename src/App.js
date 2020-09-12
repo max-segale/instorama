@@ -197,6 +197,9 @@ function ImgControls(props) {
           </div>
           <button className='finish' onClick={props.onFinish}>Finish</button>
         </div>
+        <div className='number squareOnly'>
+          <label><input type='checkbox' checked={props.isSquareOnly} onChange={props.onChangeSquareOnly} /> Square only</label>
+        </div>
       </div>
     );
   }
@@ -285,6 +288,7 @@ class App extends React.Component {
     super(props);
     this.year = new Date().getFullYear();
     this.defaultState = {
+      isSquareOnly: true,
       imgSelected: false,
       imgLoaded: false,
       imgCropped: false,
@@ -358,7 +362,7 @@ class App extends React.Component {
   // Set height of crop boxes
   handleCropHeight(input) {
     const newHeight = Number(input.value);
-    const newWidth = calculateMaxHeight(newHeight, this.state.cropWidth);
+    const newWidth = this.state.isSquareOnly ? newHeight : calculateMaxHeight(newHeight, this.state.cropWidth);
     // Set new max x pos
     const newMaxX = this.state.imgWidth - (this.state.boxCount * newWidth);
     // Set new max box count
@@ -448,6 +452,13 @@ class App extends React.Component {
   }
 
   // Return to image selection
+  handleChangeSquareOnly(isSquareOnly) {
+    this.setState({
+      isSquareOnly
+    });
+  }
+
+  // Return to image selection
   handleCancel() {
     this.setState(this.defaultState);
   }
@@ -502,6 +513,7 @@ class App extends React.Component {
           </div>
           <ImgControls
             show={this.state.imgLoaded && !this.state.imgCropped}
+            isSquareOnly={this.state.isSquareOnly}
             boxCount={this.state.boxCount}
             boxCountMax={this.state.boxCountMax}
             minHeight={this.state.imgHeight}
@@ -515,6 +527,7 @@ class App extends React.Component {
             onYPos={(e) => this.handleStartY(e.target)}
             onBoxMinus={() => this.handleBoxMinus()}
             onBoxPlus={() => this.handleBoxPlus()}
+            onChangeSquareOnly={(e) => this.handleChangeSquareOnly(e.target.checked)}
             onCancel={() => this.handleCancel()}
             onFinish={() => this.handleFinish()}
           />
