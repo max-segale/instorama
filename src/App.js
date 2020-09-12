@@ -360,9 +360,9 @@ class App extends React.Component {
     const newHeight = Number(input.value);
     const newWidth = calculateMaxHeight(newHeight, this.state.cropWidth);
     // Set new max x pos
-    const newMaxX = this.state.imgWidth - (this.state.boxCount * newHeight);
+    const newMaxX = this.state.imgWidth - (this.state.boxCount * newWidth);
     // Set new max box count
-    const newMaxBoxCount = Math.floor(this.state.imgWidth / newHeight);
+    const newMaxBoxCount = Math.floor(this.state.imgWidth / newWidth);
     // Make sure crop area isn't growing off right edge
     if (this.state.startX > newMaxX) {
       this.setState({
