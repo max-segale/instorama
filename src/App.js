@@ -2,6 +2,8 @@ import React from 'react';
 import logo from './icons/logo.svg';
 import './App.scss';
 
+import {calculateMaxHeight} from './InstagramSizes';
+
 // Document header
 function Header(props) {
   if (props.show) {
@@ -356,7 +358,7 @@ class App extends React.Component {
   // Set height of crop boxes
   handleCropHeight(input) {
     const newHeight = Number(input.value);
-    const newWidth = newHeight;
+    const newWidth = calculateMaxHeight(newHeight, this.state.cropWidth);
     // Set new max x pos
     const newMaxX = this.state.imgWidth - (this.state.boxCount * newHeight);
     // Set new max box count
@@ -401,6 +403,9 @@ class App extends React.Component {
     const panoRatio = this.state.imgWidth / this.state.imgHeight;
     const cropRatio = (this.state.boxCount * this.state.cropWidth) / this.state.cropHeight;
     let newMaxHeight = panoRatio * this.state.imgHeight / cropRatio;
+    
+
+    
     // Make sure new height isn't greater than image height
     if (newMaxHeight > this.state.imgHeight) {
       newMaxHeight = this.state.imgHeight;
