@@ -221,19 +221,40 @@ class ImgBlock extends React.Component {
     });
   }
   componentDidUpdate() {
-    const imgX = this.props.cropX * -1;
-    const imgY = this.props.cropY * -1;
     let imgURL = null;
     if (this.props.img) {
-      this.state.context.drawImage(this.props.img, imgX, imgY);
+      this.drawImage(this.state.context);
       imgURL = this.imgCanvas.toDataURL(this.props.type);
       this.imgRef.current.src = imgURL;
     }
   }
+
+  drawImage(context) {
+    const imgX = this.props.cropX * -1;
+    const imgY = this.props.cropY * -1;
+    context.drawImage(this.props.img, imgX, imgY);
+  }
+
   render() {
     return (
       <img ref={this.imgRef} alt={this.imgName} />
     );
+  }
+}
+
+class ScalingImgBlock extends ImgBlock {
+
+  drawImage(context) {
+    const width = context.canvas.width;
+    const height = context.canvas.height;
+    const imgWidth = this.props.img.width;
+    const imgHeight = this.props.img.height;
+    const scaledHeight = imgHeight / imgWidth * height;
+    const imgX = 0;
+    const imgY = height / 2 - scaledHeight / 2;
+    context.fillStyle = 'white';
+    context.fillRect(0, 0, width, height);
+    context.drawImage(this.props.img, 0, 0, imgWidth, imgHeight, imgX, imgY, width, scaledHeight);
   }
 }
 
@@ -261,6 +282,23 @@ function ImgResults(props) {
         </li>
       );
     }
+
+    // Also add the full-pano preview in case they want it.
+    const name = 'Full-size preview';
+    results.push(
+      <li key={props.boxCount}>
+        <ScalingImgBlock
+            name={name}
+            img={props.imgElement}
+            width={props.imgWidth}
+            height={props.imgHeight}
+            cropX={0}
+            cropY={0}
+            type={props.imgType}
+          />
+          <div className='counter'>{name}</div>
+        </li>
+    );
     return (
       <div className='result'>
         <ul>
