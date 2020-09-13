@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import logo from './icons/logo.svg';
 import './App.scss';
 
@@ -242,6 +242,7 @@ class ImgBlock extends React.Component {
   }
 }
 
+// Renders the given image to fit inside the given dimensions.
 class ScalingImgBlock extends ImgBlock {
 
   drawImage(context) {
@@ -252,9 +253,40 @@ class ScalingImgBlock extends ImgBlock {
     const scaledHeight = imgHeight / imgWidth * height;
     const imgX = 0;
     const imgY = height / 2 - scaledHeight / 2;
-    context.fillStyle = 'white';
+    context.fillStyle = this.props.backgroundColor || 'white';
     context.fillRect(0, 0, width, height);
     context.drawImage(this.props.img, 0, 0, imgWidth, imgHeight, imgX, imgY, width, scaledHeight);
+  }
+}
+
+class ColorSelector extends React.Component {
+  colors = ['White', 'Black'];
+
+  constructor(props) {
+    super(props);
+    this.defaultState = {
+      color: this.colors[0]
+    };
+    this.state = this.defaultState;
+  }
+
+  handleOnBackgroundColorChange(color) {
+    this.setState({
+      color
+    });
+    this.props.onColorChange(color);
+  }
+
+  render() {
+    return (
+      <select onChange={(e) => this.handleOnBackgroundColorChange(e.target.value)} value={this.state.color}>
+        {this.colors.map(c => {
+          return (
+            <option value={c.toLowerCase()} key={c}>{c}</option>
+          )
+        })}
+      </select>
+    )
   }
 }
 
@@ -262,6 +294,9 @@ class ScalingImgBlock extends ImgBlock {
 function ImgResults(props) {
   const results = [];
   let cropX = props.xPos;
+
+  const [backgroundColor, setBackgroundColor] = useState();
+
   if (props.show) {
     for (let b = 0; b < props.boxCount; b += 1) {
       if (b > 0) {
@@ -295,9 +330,11 @@ function ImgResults(props) {
             cropX={0}
             cropY={0}
             type={props.imgType}
+            backgroundColor={backgroundColor}
           />
           <div className='counter'>{name}</div>
-        </li>
+          <ColorSelector onColorChange={setBackgroundColor} />
+      </li>
     );
     return (
       <div className='result'>
