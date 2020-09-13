@@ -450,7 +450,7 @@ class App extends React.Component {
     });
   }
 
-  // Return to image selection
+  // Allow rectangular image boxes or not.
   handleChangeSquareOnly(isSquareOnly) {
     this.setState(state => {
       return {
