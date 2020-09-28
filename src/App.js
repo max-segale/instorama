@@ -2,6 +2,8 @@ import React from 'react';
 import logo from './icons/logo.svg';
 import './App.scss';
 
+import {calculateMaxHeight} from './InstagramSizes';
+
 // Document header
 function Header(props) {
   if (props.show) {
@@ -195,6 +197,9 @@ function ImgControls(props) {
           </div>
           <button className='finish' onClick={props.onFinish}>Finish</button>
         </div>
+        <div className='number squareOnly'>
+          <label><input type='checkbox' checked={props.isSquareOnly} onChange={props.onChangeSquareOnly} /> Square only</label>
+        </div>
       </div>
     );
   }
@@ -283,6 +288,7 @@ class App extends React.Component {
     super(props);
     this.year = new Date().getFullYear();
     this.defaultState = {
+      isSquareOnly: true,
       imgSelected: false,
       imgLoaded: false,
       imgCropped: false,
@@ -355,30 +361,29 @@ class App extends React.Component {
 
   // Set height of crop boxes
   handleCropHeight(input) {
-    const newHeight = Number(input.value);
-    const newWidth = newHeight;
-    // Set new max x pos
-    const newMaxX = this.state.imgWidth - (this.state.boxCount * newHeight);
-    // Set new max box count
-    const newMaxBoxCount = Math.floor(this.state.imgWidth / newHeight);
-    // Make sure crop area isn't growing off right edge
-    if (this.state.startX > newMaxX) {
-      this.setState({
-        startX: newMaxX
-      });
-    }
-    // Make sure crop area isn't going off the bottom
-    if ((newHeight + this.state.startY) > this.state.imgHeight) {
-      this.setState({
-        startY: this.state.imgHeight - newHeight
-      });
-    }
-    this.setState({
-      boxCountMax: newMaxBoxCount,
-      cropWidth: newWidth,
-      cropHeight: newHeight,
-      maxX: newMaxX,
-      maxY: this.state.imgHeight - newHeight
+    this.recalculateCropHeight(Number(input.value))
+  }
+
+  recalculateCropHeight(newHeight) {
+    this.setState((state) => {
+      const newWidth = state.isSquareOnly ? newHeight : calculateMaxHeight(newHeight, state.cropWidth);
+      // Set new max box count
+      const newMaxBoxCount = Math.floor(state.imgWidth / newWidth);
+      const newBoxCount = Math.min(state.boxCount, newMaxBoxCount);
+      // Set new max x pos
+      const newMaxX = state.imgWidth - (newBoxCount * newWidth);
+      return {
+        // Make sure crop area isn't growing off right edge
+        startX: Math.min(state.startX, newMaxX),
+        // Make sure crop area isn't going off the bottom
+        startY: ((newHeight + state.startY) > state.imgHeight) ? state.imgHeight - newHeight : state.startY,
+        boxCountMax: newMaxBoxCount,
+        boxCount: newBoxCount,
+        cropWidth: newWidth,
+        cropHeight: newHeight,
+        maxX: newMaxX,
+        maxY: state.imgHeight - newHeight
+      };
     });
   }
 
@@ -398,48 +403,64 @@ class App extends React.Component {
 
   // Set max box height so the row doesn't extend off the right edge
   adjustMaxHeight() {
-    const panoRatio = this.state.imgWidth / this.state.imgHeight;
-    const cropRatio = (this.state.boxCount * this.state.cropWidth) / this.state.cropHeight;
-    let newMaxHeight = panoRatio * this.state.imgHeight / cropRatio;
-    // Make sure new height isn't greater than image height
-    if (newMaxHeight > this.state.imgHeight) {
-      newMaxHeight = this.state.imgHeight;
-    }
-    this.setState({
-      maxHeight: newMaxHeight
+    this.setState((state) => {
+      const panoRatio = state.imgWidth / state.imgHeight;
+      const cropRatio = (state.boxCount * state.cropWidth) / state.cropHeight;
+      let newMaxHeight = panoRatio * state.imgHeight / cropRatio;
+      // Make sure new height isn't greater than image height
+      if (newMaxHeight > state.imgHeight) {
+        newMaxHeight = state.imgHeight;
+      }
+      
+      return {
+        maxHeight: newMaxHeight
+      }
     });
   }
 
   // Reduce number of cropped images
   handleBoxMinus() {
     const boxNum = this.state.boxCount -= 1;
-    const newMaxX = this.state.imgWidth - (boxNum * this.state.cropHeight);
-    // check max crop height
-    this.adjustMaxHeight();
-    // Set new box count and max x
     this.setState({
-      boxCount: boxNum,
-      maxX: newMaxX
+      boxCount: boxNum
     });
+    this.recalculateBoxes();
   }
 
   // Increase number of cropped images
   handleBoxPlus() {
     const boxNum = this.state.boxCount += 1;
-    const newMaxX = this.state.imgWidth - (boxNum * this.state.cropHeight);
-    // check max crop height
-    this.adjustMaxHeight();
-    // Make sure new box isn't placed off right edge edge
-    if (this.state.startX > newMaxX) {
-      this.setState({
-        startX: newMaxX
-      });
-    }
-    // Set new box count and max x
     this.setState({
-      boxCount: boxNum,
-      maxX: newMaxX
+      boxCount: boxNum
     });
+    this.recalculateBoxes();
+  }
+
+  recalculateBoxes() {
+    this.adjustMaxHeight();
+    this.setState((state) => {
+      const newMaxX = state.imgWidth - (state.boxCount * state.cropHeight);
+      // check max crop height
+      // Set new box count and max x
+      return {
+        // Make sure new box isn't placed off right edge edge
+        startX: Math.min(state.startX, newMaxX),
+        maxX: newMaxX
+      }
+    });
+  }
+
+  // Allow rectangular image boxes or not.
+  handleChangeSquareOnly(isSquareOnly) {
+    this.setState(state => {
+      return {
+        isSquareOnly,
+        cropWidth: isSquareOnly ? state.cropHeight : state.cropWidth
+      }
+    });
+
+    this.recalculateBoxes();
+    this.recalculateCropHeight(this.state.cropHeight);
   }
 
   // Return to image selection
@@ -497,6 +518,7 @@ class App extends React.Component {
           </div>
           <ImgControls
             show={this.state.imgLoaded && !this.state.imgCropped}
+            isSquareOnly={this.state.isSquareOnly}
             boxCount={this.state.boxCount}
             boxCountMax={this.state.boxCountMax}
             minHeight={this.state.imgHeight}
@@ -510,6 +532,7 @@ class App extends React.Component {
             onYPos={(e) => this.handleStartY(e.target)}
             onBoxMinus={() => this.handleBoxMinus()}
             onBoxPlus={() => this.handleBoxPlus()}
+            onChangeSquareOnly={(e) => this.handleChangeSquareOnly(e.target.checked)}
             onCancel={() => this.handleCancel()}
             onFinish={() => this.handleFinish()}
           />
