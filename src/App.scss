@@ -310,7 +310,7 @@ footer {
 }
 
 // Responsive layout
-@media (orientation: landscape) {
+@media (min-aspect-ratio: 2/1) {
   .content {
     min-height: 100vh;
     header {
