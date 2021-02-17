@@ -114,7 +114,7 @@ function ImgBoxes(props) {
 // Input to adjust crop position
 function RangeInput(props) {
   let disable = false;
-  if (props.minVal >= props.maxVal) {
+  if (props.minVal >= props.maxVal || props.maxVal < 10) {
     disable = true;
   }
   return (
@@ -154,7 +154,7 @@ function ImgControls(props) {
         <ul className='options'>
           <RangeInput
             name={'Height'}
-            minVal={props.minHeight / 2}
+            minVal={props.minHeight}
             maxVal={props.maxHeight}
             defaultVal={props.maxHeight}
             onControl={props.onCropHeight}
@@ -304,30 +304,36 @@ class App extends React.Component {
     this.state = this.defaultState;
   }
 
-  // Image loaded
+  // Image loaded, set initial crop values
   handleImgLoad(img) {
     // How many boxes can fit in the image
-    const initBoxCount = Math.floor(img.width / img.height);
+    let initBoxCount = Math.floor(img.width / img.height);
     // How much space will be left over
-    const widthRem = img.width - (initBoxCount * img.height);
-    if (img.width < img.height) {
-      alert('Your photo must be wider than it is tall. Please select a different photo.');
-      this.handleCancel();
-    } else {
+    let widthRem = img.width - (initBoxCount * img.height);
+    // What is the max crop height
+    let maxCropHeight = img.height;
+    // Use different inital if the photo is not a panorama
+    if (img.width < img.height * 2) {
+      initBoxCount = 2;
+      widthRem = 0;
+      maxCropHeight = img.width / 2;
       this.setState({
-        img: img,
-        imgWidth: img.width,
-        imgHeight: img.height,
-        imgLoaded: true,
-        boxCount: initBoxCount,
-        boxCountMax: initBoxCount,
-        startX: widthRem / 2,
-        maxX: widthRem,
-        maxHeight: img.height,
-        cropWidth: (img.width - widthRem) / initBoxCount,
-        cropHeight: img.height
+        maxY: img.height - maxCropHeight
       });
     }
+    this.setState({
+      img: img,
+      imgWidth: img.width,
+      imgHeight: img.height,
+      imgLoaded: true,
+      boxCount: initBoxCount,
+      boxCountMax: initBoxCount,
+      startX: widthRem / 2,
+      maxX: widthRem,
+      maxHeight: maxCropHeight,
+      cropWidth: (img.width - widthRem) / initBoxCount,
+      cropHeight: maxCropHeight
+    });
   }
 
   // Image read
@@ -412,23 +418,19 @@ class App extends React.Component {
 
   // Reduce number of cropped images
   handleBoxMinus() {
-    const boxNum = this.state.boxCount -= 1;
+    const boxNum = this.state.boxCount - 1;
     const newMaxX = this.state.imgWidth - (boxNum * this.state.cropHeight);
-    // check max crop height
-    this.adjustMaxHeight();
     // Set new box count and max x
     this.setState({
       boxCount: boxNum,
       maxX: newMaxX
-    });
+    }, this.adjustMaxHeight);
   }
 
   // Increase number of cropped images
   handleBoxPlus() {
-    const boxNum = this.state.boxCount += 1;
+    const boxNum = this.state.boxCount + 1;
     const newMaxX = this.state.imgWidth - (boxNum * this.state.cropHeight);
-    // check max crop height
-    this.adjustMaxHeight();
     // Make sure new box isn't placed off right edge edge
     if (this.state.startX > newMaxX) {
       this.setState({
@@ -439,7 +441,7 @@ class App extends React.Component {
     this.setState({
       boxCount: boxNum,
       maxX: newMaxX
-    });
+    }, this.adjustMaxHeight);
   }
 
   // Return to image selection
@@ -499,7 +501,7 @@ class App extends React.Component {
             show={this.state.imgLoaded && !this.state.imgCropped}
             boxCount={this.state.boxCount}
             boxCountMax={this.state.boxCountMax}
-            minHeight={this.state.imgHeight}
+            minHeight={this.state.imgHeight / 10}
             maxHeight={this.state.maxHeight}
             startHori={this.state.startX}
             maxHori={this.state.maxX}
