@@ -18,7 +18,7 @@
       "sizes": "512x512"
     }
   ],
-  "start_url": "http://instorama.net",
+  "start_url": "https://instorama.net",
   "display": "minimal-ui",
   "theme_color": "#EE7571",
   "background_color": "#EE7571"
